@@ -30,9 +30,10 @@ class LogRepositoryTest {
 	@Test
 	void testEditar() {
 		Log log = new Log("123.123.123.125", "GET", "200", "Crome");
-		log.setId(1l);
+		Long id = 1l;
+		log.setId(id);
 		repository.editar(log);
-		assertEquals(repository.buscarPorId(1l).get().getIp(), log.getIp());
+		assertEquals(repository.buscarPorId(id).get().getIp(), log.getIp());
 	}
 
 	@Test

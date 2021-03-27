@@ -16,12 +16,13 @@ public class LogService implements CRUDService<Log, Long> {
 	private LogRepository repository;
 
 	@Override
-	public void adicionar(Log log) {
+	public void adicionar(Log log) {		
 		repository.adicionar(log);
 	}
 
 	@Override
 	public void editar(Log log) {
+		buscarPorId(log.getId());
 		repository.editar(log);
 	}
 
