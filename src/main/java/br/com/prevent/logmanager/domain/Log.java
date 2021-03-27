@@ -3,15 +3,37 @@ package br.com.prevent.logmanager.domain;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.validation.constraints.Pattern;
+
+@Entity(name = "logs")
 public class Log implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
+	@Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "log_id_seq")
+    @SequenceGenerator(name = "log_id_seq", sequenceName = "log_id_seq")
 	private Long id;
+	
 	private Date data;
+	
+	@Pattern(regexp = "^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$")
+	@Column(length = 15, nullable = false)
 	private String ip;
+	
+	@Column(length = 50)
 	private String request;
+	
+	@Column(length = 3)
 	private String status;
+	
+	@Column(name="user_agent")
 	private String userAgent;
 
 	public Log() {
