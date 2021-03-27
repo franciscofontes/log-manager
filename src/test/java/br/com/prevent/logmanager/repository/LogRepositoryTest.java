@@ -1,6 +1,12 @@
 package br.com.prevent.logmanager.repository;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,18 +29,36 @@ class LogRepositoryTest {
 
 	@Test
 	void testEditar() {
+		Log log = new Log("123.123.123.125", "GET", "200", "Crome");
+		log.setId(1l);
+		repository.editar(log);
+		assertEquals(repository.buscarPorId(1l).get().getIp(), log.getIp());
 	}
 
 	@Test
 	void testListar() {
+		List<Log> logs = repository.listar();
+		assertFalse(logs.isEmpty());
 	}
 
 	@Test
 	void testBuscarPorId() {
+		try {
+			Optional<Log> log = repository.buscarPorId(1l);
+			assertTrue(log.isPresent());
+		} catch (NullPointerException e) {
+			fail();
+		}
 	}
 
 	@Test
 	void testRemover() {
+		Long id = 3l;
+		try {
+			repository.remover(id);
+		} catch (NullPointerException e) {	
+			fail();
+		}
 	}
 
 }

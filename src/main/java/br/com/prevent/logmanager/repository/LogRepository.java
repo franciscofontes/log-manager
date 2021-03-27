@@ -51,7 +51,7 @@ public class LogRepository implements CRUDRepository<Log, Long> {
 	@Transactional
 	@Override
 	public void remover(Long id) {
-		em.remove(buscarPorId(id));
+		em.remove(buscarPorId(id).get());
 	}
 
 }
