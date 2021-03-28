@@ -9,6 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import br.com.prevent.logmanager.domain.Log;
 
@@ -19,14 +20,14 @@ class LogServiceTest {
 	private LogService service;
 
 	@Test
-	void testAdicionar() {
+	void testAdicionar() throws MethodArgumentNotValidException {
 		Log log = new Log("123.123.123.123", "GET", "200", "Crome");
 		service.adicionar(log);
 		assertTrue(log.getId() > 0);
 	}
 
 	@Test
-	void testEditar() {
+	void testEditar() throws MethodArgumentNotValidException {
 		Log log = new Log("123.123.123.125", "GET", "200", "Crome");
 		Long id = 4l;
 		log.setId(id);
@@ -47,7 +48,7 @@ class LogServiceTest {
 	}
 
 	@Test
-	void testRemover() {
+	void testRemover() throws MethodArgumentNotValidException {
 		Long id = 1l;
 		service.remover(id);
 	}

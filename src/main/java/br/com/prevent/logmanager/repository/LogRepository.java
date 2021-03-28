@@ -23,13 +23,13 @@ public class LogRepository implements CRUDRepository<Log, Long> {
 
 	@Transactional
 	@Override
-	public void adicionar(Log log) {
+	public void adicionar(Log log) throws RuntimeException {
 		em.persist(log);
 	}
 
 	@Transactional
 	@Override
-	public void editar(Log log) {
+	public void editar(Log log) throws RuntimeException {
 		em.merge(log);
 	}
 
@@ -44,13 +44,13 @@ public class LogRepository implements CRUDRepository<Log, Long> {
 	}
 
 	@Override
-	public Optional<Log> buscarPorId(Long id) {
+	public Optional<Log> buscarPorId(Long id) throws RuntimeException {
 		return Optional.of(em.find(Log.class, id));
 	}
 
 	@Transactional
 	@Override
-	public void remover(Long id) {
+	public void remover(Long id) throws RuntimeException {
 		em.remove(buscarPorId(id).get());
 	}
 

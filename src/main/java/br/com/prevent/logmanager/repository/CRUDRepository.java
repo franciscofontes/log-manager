@@ -5,13 +5,13 @@ import java.util.Optional;
 
 public interface CRUDRepository<T, ID> {
 
-	void adicionar(T entity);
+	void adicionar(T entity) throws RuntimeException;
 
-	void editar(T entity);
+	void editar(T entity) throws RuntimeException;
 
 	List<T> listar();
 
-	Optional<T> buscarPorId(ID id);
+	Optional<T> buscarPorId(ID id) throws RuntimeException;
 
-	void remover(ID id);
+	void remover(ID id) throws RuntimeException;
 }

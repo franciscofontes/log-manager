@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.Date;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -26,7 +28,7 @@ public class LogResource implements CRUDResource<Log, Long> {
 
 	@Override
 	@RequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<Void> adicionar(@RequestBody Log log) throws MethodArgumentNotValidException {
+	public ResponseEntity<Void> adicionar(@Valid @RequestBody Log log) throws MethodArgumentNotValidException {
 		log.setData(new Date());
 		service.adicionar(log);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(log.getId()).toUri();
@@ -35,7 +37,7 @@ public class LogResource implements CRUDResource<Log, Long> {
 
 	@Override
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-	public ResponseEntity<Void> editar(@RequestBody Log log, @PathVariable Long id) throws MethodArgumentNotValidException {
+	public ResponseEntity<Void> editar(@Valid @RequestBody Log log, @PathVariable Long id) throws MethodArgumentNotValidException {
 		log.setId(id);
 		service.editar(log);
 		return ResponseEntity.noContent().build();
