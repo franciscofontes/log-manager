@@ -53,6 +53,15 @@ public class Log implements Serializable {
 		this.userAgent = userAgent;
 	}
 
+	public Log(Date data, String ip, String request, String status, String userAgent) {
+		super();
+		this.data = data;
+		this.ip = ip;
+		this.request = request;
+		this.status = status;
+		this.userAgent = userAgent;
+	}
+
 	public Long getId() {
 		return id;
 	}
@@ -124,6 +133,12 @@ public class Log implements Serializable {
 		} else if (!id.equals(other.id))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Log [id=" + id + ", data=" + data + ", ip=" + ip + ", request=" + request + ", status=" + status
+				+ ", userAgent=" + userAgent + "]";
 	}
 
 }

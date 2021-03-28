@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -51,6 +53,17 @@ class LogServiceTest {
 	void testRemover() throws MethodArgumentNotValidException {
 		Long id = 1l;
 		service.remover(id);
+	}	
+	
+	@Test
+	void testGetLogsPeloArquivo() throws MethodArgumentNotValidException, IOException, ParseException {
+		List<Log> logs = service.getLogsPeloArquivo("C:\\tmp\\log\\access.log", "\\|");
+		assertFalse(logs.isEmpty());		
+	}
+	
+	@Test
+	void testAdicionarLogsPeloArquivo() throws MethodArgumentNotValidException, IOException, ParseException {
+		service.adicionarLogsPeloArquivo("C:\\tmp\\log\\access-poucosdados.log", "\\|");
 	}
 
 }
