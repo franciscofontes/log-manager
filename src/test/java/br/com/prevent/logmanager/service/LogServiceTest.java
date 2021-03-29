@@ -65,6 +65,20 @@ class LogServiceTest {
 	}
 	
 	@Test
+	void testlistarPorFiltro() throws ParseException {
+		String dataString = "";	
+		String ip = "";
+		String status = "";
+		String request = "GET";
+		String userAgent = "Teste";
+		List<Log> logs = service.listarPorFiltro(dataString, ip, status, request, userAgent, 1, 10, "id", "asc");
+		for (Log log : logs) {
+			System.out.println(log);
+		}
+		assertFalse(logs.isEmpty());
+	}
+	
+	@Test
 	void testGetLogsPeloArquivo() throws MethodArgumentNotValidException, IOException, ParseException {
 		List<Log> logs = service.getLogsPeloArquivo("C:\\tmp\\log\\access.log", "\\|");
 		assertFalse(logs.isEmpty());		

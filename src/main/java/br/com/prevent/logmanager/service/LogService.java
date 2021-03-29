@@ -73,10 +73,16 @@ public class LogService implements CRUDService<Log, Long> {
 			throw new DataIntegrityException(DataIntegrityException.MSG_REMOVER, id.toString(), Log.class);
 		}
 	}
-	
+
 	@Override
 	public List<Log> listarPorPagina(int pageNumber, int linesPerPage, String orderBy, String direction) {
-		return repository.listarPorPagina(pageNumber, linesPerPage, orderBy, direction);		
+		return repository.listarPorPagina(pageNumber, linesPerPage, orderBy, direction);
+	}
+
+	public List<Log> listarPorFiltro(String data, String ip, String status, String request, String userAgent,
+			int pageNumber, int linesPerPage, String orderBy, String direction) {
+		return repository.listarPorFiltro(data, ip, status, request, userAgent, pageNumber, linesPerPage, orderBy,
+				direction);
 	}
 
 	public List<Log> getLogsPeloArquivo(String url, String delimitador) {
@@ -93,7 +99,7 @@ public class LogService implements CRUDService<Log, Long> {
 				String request = resultado[2];
 				String status = resultado[3];
 				String userAgent = resultado[4];
-				Log log = new Log(new SimpleDateFormat(dateFormat).parse(data), ip, request, status, userAgent);				
+				Log log = new Log(new SimpleDateFormat(dateFormat).parse(data), ip, request, status, userAgent);
 				if (!validator.isIpValid(log.getIp())) {
 					throw new ArquivoLogException(LogValidatorUtil.MSG_IP_INVALIDO, nrLinha, "ip");
 				}
@@ -113,7 +119,8 @@ public class LogService implements CRUDService<Log, Long> {
 		return logs;
 	}
 
-	public void adicionarLogsPeloArquivo(String url, String delimitador) throws ArquivoLogException, MethodArgumentNotValidException {
+	public void adicionarLogsPeloArquivo(String url, String delimitador)
+			throws ArquivoLogException, MethodArgumentNotValidException {
 		List<Log> logs = getLogsPeloArquivo(url, delimitador);
 		for (Log log : logs) {
 			adicionar(log);

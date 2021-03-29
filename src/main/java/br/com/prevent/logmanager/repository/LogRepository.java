@@ -1,5 +1,6 @@
 package br.com.prevent.logmanager.repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,7 +55,41 @@ public class LogRepository implements CRUDRepository<Log, Long> {
 	public List<Log> listarPorPagina(int pageNumber, int linesPerPage, String orderBy, String direction) {
 		Query query = em.createQuery("from logs order by " + orderBy + " " + direction);
 		query.setFirstResult((pageNumber - 1) * linesPerPage);
-		query.setMaxResults(linesPerPage);		
+		query.setMaxResults(linesPerPage);
+		List<Log> logs = query.getResultList();
+		return logs;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Log> listarPorFiltro(String data, String ip, String status, String request, String userAgent,
+			int pageNumber, int linesPerPage, String orderBy, String direction) {
+		String where = "";
+		List<String> filtros = new ArrayList<>();
+		if (!data.isEmpty()) {
+			filtros.add("data='" + data + "'");
+		}
+		if (!ip.isEmpty()) {
+			filtros.add("ip like '%" + ip + "%'");
+		}
+		if (!status.isEmpty()) {
+			filtros.add("status='" + status + "'");
+		}
+		if (!request.isEmpty()) {
+			filtros.add("request like '%" + request + "%'");
+		}
+		if (!userAgent.isEmpty()) {
+			filtros.add("user_agent like '%" + userAgent + "%'");
+		}
+		for (int i = 0; i < filtros.size(); i++) {
+			String item = filtros.get(i);
+			where += item;
+			if (i < filtros.size() - 1) {
+				where += " and ";
+			}
+		}
+		Query query = em.createQuery("from logs where " + where + " order by " + orderBy + " " + direction);
+		query.setFirstResult((pageNumber - 1) * linesPerPage);
+		query.setMaxResults(linesPerPage);
 		List<Log> logs = query.getResultList();
 		return logs;
 	}

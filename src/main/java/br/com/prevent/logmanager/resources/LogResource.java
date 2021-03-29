@@ -57,15 +57,28 @@ public class LogResource implements CRUDResource<Log, Long> {
 	public List<Log> listar() {
 		return service.listar();
 	}
-	
+
 	@Override
 	@RequestMapping(value = "/page", method = RequestMethod.GET)
-	public ResponseEntity<List<Log>> listarPorPagina(
+	public ResponseEntity<List<Log>> listarPorPagina(@RequestParam(value = "page", defaultValue = "1") Integer page,
+			@RequestParam(value = "lines", defaultValue = "12") Integer linesPerPage,
+			@RequestParam(value = "orderBy", defaultValue = "id") String orderBy,
+			@RequestParam(value = "direction", defaultValue = "ASC") String direction) {
+		return ResponseEntity.ok().body(service.listarPorPagina(page, linesPerPage, orderBy, direction));
+	}
+
+	@RequestMapping(value = "/filtro", method = RequestMethod.GET)
+	public ResponseEntity<List<Log>> listarPorFiltro(@RequestParam(value = "data", defaultValue = "") String data,
+			@RequestParam(value = "ip", defaultValue = "") String ip,
+			@RequestParam(value = "status", defaultValue = "") String status,
+			@RequestParam(value = "request", defaultValue = "") String request,
+			@RequestParam(value = "userAgent", defaultValue = "") String userAgent,
 			@RequestParam(value = "page", defaultValue = "1") Integer page,
 			@RequestParam(value = "lines", defaultValue = "12") Integer linesPerPage,
 			@RequestParam(value = "orderBy", defaultValue = "id") String orderBy,
-			@RequestParam(value = "direction", defaultValue = "ASC") String direction) {		
-		return ResponseEntity.ok().body(service.listarPorPagina(page, linesPerPage, orderBy, direction));
+			@RequestParam(value = "direction", defaultValue = "ASC") String direction) {
+		return ResponseEntity.ok().body(
+				service.listarPorFiltro(data, ip, status, request, userAgent, page, linesPerPage, orderBy, direction));
 	}
 
 	@Override
@@ -82,11 +95,13 @@ public class LogResource implements CRUDResource<Log, Long> {
 	}
 
 	@RequestMapping(value = "/adicionarPeloArquivo", method = RequestMethod.POST)
-	public ResponseEntity<Void> adicionarPeloArquivo(@RequestBody String url) throws MethodArgumentNotValidException, JsonMappingException, JsonProcessingException {
+	public ResponseEntity<Void> adicionarPeloArquivo(@RequestBody String url)
+			throws MethodArgumentNotValidException, JsonMappingException, JsonProcessingException {
 		ObjectMapper mapper = new ObjectMapper();
-		Map<String, Object> parsedMap = mapper.readValue(url, new TypeReference<HashMap<String, Object>>() {});
+		Map<String, Object> parsedMap = mapper.readValue(url, new TypeReference<HashMap<String, Object>>() {
+		});
 		service.adicionarLogsPeloArquivo(parsedMap.get("url").toString(), "\\|");
 		return ResponseEntity.noContent().build();
 	}
-	
+
 }
