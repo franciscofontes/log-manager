@@ -56,6 +56,15 @@ class LogServiceTest {
 	}	
 	
 	@Test
+	void testListarPorPagina() {
+		List<Log> logs = service.listarPorPagina(1, 10, "ip", "desc");
+		for (Log log : logs) {
+			System.out.println(log);
+		}
+		assertFalse(logs.isEmpty());
+	}
+	
+	@Test
 	void testGetLogsPeloArquivo() throws MethodArgumentNotValidException, IOException, ParseException {
 		List<Log> logs = service.getLogsPeloArquivo("C:\\tmp\\log\\access.log", "\\|");
 		assertFalse(logs.isEmpty());		

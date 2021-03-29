@@ -5,10 +5,7 @@ import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
+import javax.persistence.Query;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Repository;
@@ -34,13 +31,11 @@ public class LogRepository implements CRUDRepository<Log, Long> {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public List<Log> listar() {
-		CriteriaBuilder cb = em.getCriteriaBuilder();
-		CriteriaQuery<Log> cq = cb.createQuery(Log.class);
-		Root<Log> rootEntry = cq.from(Log.class);
-		CriteriaQuery<Log> all = cq.select(rootEntry);
-		TypedQuery<Log> allQuery = em.createQuery(all);
-		return allQuery.getResultList();
+		Query query = em.createQuery("from logs");
+		List<Log> logs = query.getResultList();
+		return logs;
 	}
 
 	@Override
@@ -52,6 +47,16 @@ public class LogRepository implements CRUDRepository<Log, Long> {
 	@Override
 	public void remover(Long id) throws RuntimeException {
 		em.remove(buscarPorId(id).get());
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<Log> listarPorPagina(int pageNumber, int linesPerPage, String orderBy, String direction) {
+		Query query = em.createQuery("from logs order by " + orderBy + " " + direction);
+		query.setFirstResult((pageNumber - 1) * linesPerPage);
+		query.setMaxResults(linesPerPage);		
+		List<Log> logs = query.getResultList();
+		return logs;
 	}
 
 }

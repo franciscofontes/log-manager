@@ -73,6 +73,11 @@ public class LogService implements CRUDService<Log, Long> {
 			throw new DataIntegrityException(DataIntegrityException.MSG_REMOVER, id.toString(), Log.class);
 		}
 	}
+	
+	@Override
+	public List<Log> listarPorPagina(int pageNumber, int linesPerPage, String orderBy, String direction) {
+		return repository.listarPorPagina(pageNumber, linesPerPage, orderBy, direction);		
+	}
 
 	public List<Log> getLogsPeloArquivo(String url, String delimitador) {
 		List<Log> logs = new ArrayList<>();

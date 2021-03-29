@@ -15,4 +15,6 @@ public interface CRUDService<T, ID> {
 	T buscarPorId(ID id);
 
 	void remover(ID id) throws MethodArgumentNotValidException;
+	
+	List<T> listarPorPagina(int pageNumber, int linesPerPage, String orderBy, String direction);
 }
