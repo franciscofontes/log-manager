@@ -2,7 +2,9 @@ package br.com.prevent.logmanager.resources;
 
 import java.net.URI;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -15,6 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.prevent.logmanager.domain.Log;
 import br.com.prevent.logmanager.service.LogService;
@@ -37,7 +44,8 @@ public class LogResource implements CRUDResource<Log, Long> {
 
 	@Override
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-	public ResponseEntity<Void> editar(@Valid @RequestBody Log log, @PathVariable Long id) throws MethodArgumentNotValidException {
+	public ResponseEntity<Void> editar(@Valid @RequestBody Log log, @PathVariable Long id)
+			throws MethodArgumentNotValidException {
 		log.setId(id);
 		service.editar(log);
 		return ResponseEntity.noContent().build();
@@ -62,4 +70,12 @@ public class LogResource implements CRUDResource<Log, Long> {
 		return ResponseEntity.noContent().build();
 	}
 
+	@RequestMapping(value = "/adicionarPeloArquivo", method = RequestMethod.POST)
+	public ResponseEntity<Void> adicionarPeloArquivo(@RequestBody String url) throws MethodArgumentNotValidException, JsonMappingException, JsonProcessingException {
+		ObjectMapper mapper = new ObjectMapper();
+		Map<String, Object> parsedMap = mapper.readValue(url, new TypeReference<HashMap<String, Object>>() {});
+		service.adicionarLogsPeloArquivo(parsedMap.get("url").toString(), "\\|");
+		return ResponseEntity.noContent().build();
+	}
+	
 }

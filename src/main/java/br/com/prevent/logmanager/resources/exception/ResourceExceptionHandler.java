@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import br.com.prevent.logmanager.service.exception.ArquivoLogException;
 import br.com.prevent.logmanager.service.exception.DataIntegrityException;
 import br.com.prevent.logmanager.service.exception.ObjectNotFoundException;
 
@@ -28,6 +29,13 @@ public class ResourceExceptionHandler {
 				System.currentTimeMillis());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
 	}
+	
+	@ExceptionHandler(ArquivoLogException.class)
+	public ResponseEntity<StandardError> arquivoLog(ArquivoLogException e, HttpServletRequest request) {
+		StandardError error = new StandardError(HttpStatus.BAD_REQUEST.value(), e.getMessage(),
+				System.currentTimeMillis());
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+	}	
 	
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<StandardError> validation(MethodArgumentNotValidException e, HttpServletRequest request) {

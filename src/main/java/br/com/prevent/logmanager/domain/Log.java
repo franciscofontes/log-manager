@@ -10,9 +10,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
+
+import br.com.prevent.logmanager.service.validation.LogValid;
 
 @Entity(name = "logs")
+@LogValid
 public class Log implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -25,7 +27,6 @@ public class Log implements Serializable {
 	@Column(nullable = false)
 	private Date data;
 
-	@Pattern(regexp = "^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$")
 	@Column(length = 15, nullable = false)
 	private String ip;
 
@@ -33,7 +34,6 @@ public class Log implements Serializable {
 	@Column(length = 50, nullable = false)
 	private String request;
 
-	@Pattern(regexp = "1\\d\\d|2\\d\\d|3\\d\\d|4\\d\\d|5\\d\\d")
 	@Column(length = 3, nullable = false)
 	private String status;
 

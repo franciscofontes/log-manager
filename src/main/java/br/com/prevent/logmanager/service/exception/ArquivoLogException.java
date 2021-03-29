@@ -7,6 +7,10 @@ public class ArquivoLogException extends RuntimeException {
 	public ArquivoLogException(String msg, int nrLinha, String campo) {
 		super(msg + ". Linha: " + nrLinha + ". Campo: " + campo);
 	}
+	
+	public ArquivoLogException(String msg, int nrLinha) {
+		super(msg + ". Linha: " + nrLinha);
+	}	
 
 	public ArquivoLogException(String msg) {
 		super(msg);

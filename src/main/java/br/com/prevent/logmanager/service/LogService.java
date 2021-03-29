@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.ConstraintViolationException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import br.com.prevent.logmanager.repository.LogRepository;
 import br.com.prevent.logmanager.service.exception.ArquivoLogException;
 import br.com.prevent.logmanager.service.exception.DataIntegrityException;
 import br.com.prevent.logmanager.service.exception.ObjectNotFoundException;
+import br.com.prevent.logmanager.service.validation.util.LogValidatorUtil;
 
 @Service
 public class LogService implements CRUDService<Log, Long> {
@@ -31,7 +34,7 @@ public class LogService implements CRUDService<Log, Long> {
 	public void adicionar(Log log) throws MethodArgumentNotValidException {
 		try {
 			repository.adicionar(log);
-		} catch (DataIntegrityViolationException e) {
+		} catch (ConstraintViolationException | DataIntegrityViolationException e) {
 			throw new DataIntegrityException(DataIntegrityException.MSG_ADD, null, Log.class);
 		}
 	}
@@ -75,6 +78,7 @@ public class LogService implements CRUDService<Log, Long> {
 		List<Log> logs = new ArrayList<>();
 		int nrLinha = 1;
 		String dateFormat = "yyyy-MM-dd HH:mm:ss.SSS";
+		LogValidatorUtil validator = new LogValidatorUtil();
 		try {
 			Path path = Paths.get(url);
 			for (String linha : Files.readAllLines(path)) {
@@ -84,19 +88,27 @@ public class LogService implements CRUDService<Log, Long> {
 				String request = resultado[2];
 				String status = resultado[3];
 				String userAgent = resultado[4];
-				logs.add(new Log(new SimpleDateFormat().parse(data), ip, request, status,
-						userAgent));
+				Log log = new Log(new SimpleDateFormat(dateFormat).parse(data), ip, request, status, userAgent);				
+				if (!validator.isIpValid(log.getIp())) {
+					throw new ArquivoLogException(LogValidatorUtil.MSG_IP_INVALIDO, nrLinha, "ip");
+				}
+				if (!validator.isStatusValid(log.getStatus())) {
+					throw new ArquivoLogException(LogValidatorUtil.MSG_STATUS_INVALIDO, nrLinha, "status");
+				}
+				logs.add(log);
 				nrLinha++;
 			}
 		} catch (IOException e) {
 			throw new ArquivoLogException("Ocorreu um erro ao importar o arquivo");
 		} catch (ParseException e) {
 			throw new ArquivoLogException("Data nao esta no formato: " + dateFormat, nrLinha, "data");
+		} catch (ArrayIndexOutOfBoundsException e) {
+			throw new ArquivoLogException("Esta faltando algum atributo", nrLinha);
 		}
 		return logs;
 	}
 
-	public void adicionarLogsPeloArquivo(String url, String delimitador) throws MethodArgumentNotValidException {
+	public void adicionarLogsPeloArquivo(String url, String delimitador) throws ArquivoLogException, MethodArgumentNotValidException {
 		List<Log> logs = getLogsPeloArquivo(url, delimitador);
 		for (Log log : logs) {
 			adicionar(log);
