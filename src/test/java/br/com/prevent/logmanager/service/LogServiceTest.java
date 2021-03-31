@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import br.com.prevent.logmanager.domain.Log;
+import br.com.prevent.logmanager.repository.domain.Page;
 
 @SpringBootTest
 class LogServiceTest {
@@ -57,11 +58,9 @@ class LogServiceTest {
 	
 	@Test
 	void testListarPorPagina() {
-		List<Log> logs = service.listarPorPagina(1, 10, "ip", "desc");
-		for (Log log : logs) {
-			System.out.println(log);
-		}
-		assertFalse(logs.isEmpty());
+		Page<Log> page = service.listarPorPagina(2, 12, "ip", "desc");
+		System.out.println(page);
+		assertFalse(page.getContent().isEmpty());
 	}
 	
 	@Test

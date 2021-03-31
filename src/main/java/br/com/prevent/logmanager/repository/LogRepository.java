@@ -12,6 +12,7 @@ import javax.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
 import br.com.prevent.logmanager.domain.Log;
+import br.com.prevent.logmanager.repository.domain.Page;
 
 @Repository
 public class LogRepository implements CRUDRepository<Log, Long> {
@@ -52,12 +53,23 @@ public class LogRepository implements CRUDRepository<Log, Long> {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<Log> listarPorPagina(int pageNumber, int linesPerPage, String orderBy, String direction) {
+	public Page<Log> listarPorPagina(int pageNumber, int linesPerPage, String orderBy, String direction) {
 		Query query = em.createQuery("from logs order by " + orderBy + " " + direction);
 		query.setFirstResult((pageNumber - 1) * linesPerPage);
 		query.setMaxResults(linesPerPage);
 		List<Log> logs = query.getResultList();
-		return logs;
+
+		Query queryCount = em.createQuery("select count(log.id) from logs log");
+		long countResult = (long) queryCount.getSingleResult();
+
+		int totalElements = Long.valueOf(countResult).intValue();
+		int totalPages = totalElements / linesPerPage;	
+		boolean first = pageNumber == 1;
+		boolean last = pageNumber == totalPages;
+
+		Page<Log> page = new Page<Log>(logs, pageNumber, first, last, linesPerPage, totalPages, totalElements);
+
+		return page;
 	}
 
 	@SuppressWarnings("unchecked")

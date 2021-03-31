@@ -10,15 +10,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-public interface CRUDResource<T, ID> {
+import br.com.prevent.logmanager.repository.domain.Page;
 
-	ResponseEntity<Void> adicionar(@Valid @RequestBody T entity) throws MethodArgumentNotValidException;
+public interface CRUDResource<T, DTO, ID> {
+
+	ResponseEntity<Void> adicionar(@Valid @RequestBody T t) throws MethodArgumentNotValidException;
 
 	ResponseEntity<Void> editar(@Valid @RequestBody T t, @PathVariable ID id) throws MethodArgumentNotValidException;
 
-	List<T> listar();
+	List<DTO> listar();
 	
-	public ResponseEntity<List<T>> listarPorPagina(
+	public ResponseEntity<Page<DTO>> listarPorPagina(
 			@RequestParam(value = "page", defaultValue = "1") Integer page,
 			@RequestParam(value = "lines", defaultValue = "12") Integer linesPerPage,
 			@RequestParam(value = "orderBy", defaultValue = "id") String orderBy,

@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
+import br.com.prevent.logmanager.repository.domain.Page;
+
 public interface CRUDService<T, ID> {
 
 	void adicionar(T entity) throws MethodArgumentNotValidException;
@@ -16,5 +18,5 @@ public interface CRUDService<T, ID> {
 
 	void remover(ID id) throws MethodArgumentNotValidException;
 	
-	List<T> listarPorPagina(int pageNumber, int linesPerPage, String orderBy, String direction);
+	Page<T> listarPorPagina(int pageNumber, int linesPerPage, String orderBy, String direction);
 }

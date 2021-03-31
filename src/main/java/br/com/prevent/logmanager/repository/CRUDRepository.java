@@ -3,6 +3,8 @@ package br.com.prevent.logmanager.repository;
 import java.util.List;
 import java.util.Optional;
 
+import br.com.prevent.logmanager.repository.domain.Page;
+
 public interface CRUDRepository<T, ID> {
 
 	void adicionar(T entity) throws RuntimeException;
@@ -15,5 +17,5 @@ public interface CRUDRepository<T, ID> {
 
 	void remover(ID id) throws RuntimeException;
 	
-	List<T> listarPorPagina(int pageNumber, int linesPerPage, String orderBy, String direction);
+	Page<T> listarPorPagina(int pageNumber, int linesPerPage, String orderBy, String direction);
 }

@@ -19,6 +19,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import br.com.prevent.logmanager.domain.Log;
 import br.com.prevent.logmanager.repository.LogRepository;
+import br.com.prevent.logmanager.repository.domain.Page;
 import br.com.prevent.logmanager.service.exception.ArquivoLogException;
 import br.com.prevent.logmanager.service.exception.DataIntegrityException;
 import br.com.prevent.logmanager.service.exception.ObjectNotFoundException;
@@ -75,7 +76,7 @@ public class LogService implements CRUDService<Log, Long> {
 	}
 
 	@Override
-	public List<Log> listarPorPagina(int pageNumber, int linesPerPage, String orderBy, String direction) {
+	public Page<Log> listarPorPagina(int pageNumber, int linesPerPage, String orderBy, String direction) {
 		return repository.listarPorPagina(pageNumber, linesPerPage, orderBy, direction);
 	}
 
@@ -126,5 +127,5 @@ public class LogService implements CRUDService<Log, Long> {
 			adicionar(log);
 		}
 	}
-
+	
 }

@@ -61,6 +61,15 @@ public class Log implements Serializable {
 		this.status = status;
 		this.userAgent = userAgent;
 	}
+	
+	public Log(Long id, Date data, String ip, String request, String status) {
+		super();
+		this.id = id;
+		this.data = data;
+		this.ip = ip;
+		this.request = request;
+		this.status = status;
+	}	
 
 	public Long getId() {
 		return id;

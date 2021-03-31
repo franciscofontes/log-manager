@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -25,11 +26,13 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.prevent.logmanager.domain.Log;
+import br.com.prevent.logmanager.dto.LogDTO;
+import br.com.prevent.logmanager.repository.domain.Page;
 import br.com.prevent.logmanager.service.LogService;
 
 @RestController
 @RequestMapping(value = "/logs")
-public class LogResource implements CRUDResource<Log, Long> {
+public class LogResource implements CRUDResource<Log, LogDTO, Long> {
 
 	@Autowired
 	private LogService service;
@@ -54,21 +57,26 @@ public class LogResource implements CRUDResource<Log, Long> {
 
 	@Override
 	@RequestMapping(method = RequestMethod.GET)
-	public List<Log> listar() {
-		return service.listar();
+	public List<LogDTO> listar() {
+		List<Log> logs = service.listar();
+		List<LogDTO> dtos = logs.stream().map(log -> new LogDTO(log)).collect(Collectors.toList());
+		return dtos;
 	}
 
 	@Override
 	@RequestMapping(value = "/page", method = RequestMethod.GET)
-	public ResponseEntity<List<Log>> listarPorPagina(@RequestParam(value = "page", defaultValue = "1") Integer page,
+	public ResponseEntity<Page<LogDTO>> listarPorPagina(@RequestParam(value = "page", defaultValue = "1") Integer page,
 			@RequestParam(value = "lines", defaultValue = "12") Integer linesPerPage,
 			@RequestParam(value = "orderBy", defaultValue = "id") String orderBy,
 			@RequestParam(value = "direction", defaultValue = "ASC") String direction) {
-		return ResponseEntity.ok().body(service.listarPorPagina(page, linesPerPage, orderBy, direction));
+		Page<Log> pageLogs = service.listarPorPagina(page, linesPerPage, orderBy, direction);
+		List<LogDTO> dtos = pageLogs.getContent().stream().map(log -> new LogDTO(log)).collect(Collectors.toList());
+		Page<LogDTO> pageDtos = new Page<>(dtos, pageLogs.getNumber(), pageLogs.isFirst(), pageLogs.isLast(), pageLogs.getSize(), pageLogs.getTotalPages(), pageLogs.getTotalElements()); 
+		return ResponseEntity.ok().body(pageDtos);
 	}
 
-	@RequestMapping(value = "/filtro", method = RequestMethod.GET)
-	public ResponseEntity<List<Log>> listarPorFiltro(@RequestParam(value = "data", defaultValue = "") String data,
+	@RequestMapping(value = "/search", method = RequestMethod.GET)
+	public ResponseEntity<List<LogDTO>> listarPorFiltro(@RequestParam(value = "data", defaultValue = "") String data,
 			@RequestParam(value = "ip", defaultValue = "") String ip,
 			@RequestParam(value = "status", defaultValue = "") String status,
 			@RequestParam(value = "request", defaultValue = "") String request,
@@ -77,8 +85,10 @@ public class LogResource implements CRUDResource<Log, Long> {
 			@RequestParam(value = "lines", defaultValue = "12") Integer linesPerPage,
 			@RequestParam(value = "orderBy", defaultValue = "id") String orderBy,
 			@RequestParam(value = "direction", defaultValue = "ASC") String direction) {
-		return ResponseEntity.ok().body(
-				service.listarPorFiltro(data, ip, status, request, userAgent, page, linesPerPage, orderBy, direction));
+		List<Log> logs = service.listarPorFiltro(data, ip, status, request, userAgent, page, linesPerPage, orderBy,
+				direction);
+		List<LogDTO> dtos = logs.stream().map(log -> new LogDTO(log)).collect(Collectors.toList());
+		return ResponseEntity.ok().body(dtos);
 	}
 
 	@Override
