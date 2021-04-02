@@ -54,35 +54,38 @@ class LogServiceTest {
 	void testRemover() throws MethodArgumentNotValidException {
 		Long id = 1l;
 		service.remover(id);
-	}	
-	
+	}
+
 	@Test
 	void testListarPorPagina() {
 		Page<Log> page = service.listarPorPagina(2, 12, "ip", "desc");
 		System.out.println(page);
+		for (Log p : page.getContent()) {
+			System.out.println(p);
+		}
 		assertFalse(page.getContent().isEmpty());
 	}
-	
+
 	@Test
 	void testlistarPorFiltro() throws ParseException {
-		String dataString = "";	
+		String dataString = "";
 		String ip = "";
 		String status = "";
 		String request = "GET";
 		String userAgent = "Teste";
-		List<Log> logs = service.listarPorFiltro(dataString, ip, status, request, userAgent, 1, 10, "id", "asc");
-		for (Log log : logs) {
-			System.out.println(log);
+		Page<Log> page = service.listarPorFiltro(dataString, ip, status, request, userAgent, 1, 10, "id", "asc");
+		for (Log p : page.getContent()) {
+			System.out.println(p);
 		}
-		assertFalse(logs.isEmpty());
+		assertFalse(page.getContent().isEmpty());
 	}
-	
+
 	@Test
 	void testGetLogsPeloArquivo() throws MethodArgumentNotValidException, IOException, ParseException {
 		List<Log> logs = service.getLogsPeloArquivo("C:\\tmp\\log\\access.log", "\\|");
-		assertFalse(logs.isEmpty());		
+		assertFalse(logs.isEmpty());
 	}
-	
+
 	@Test
 	void testAdicionarLogsPeloArquivo() throws MethodArgumentNotValidException, IOException, ParseException {
 		service.adicionarLogsPeloArquivo("C:\\tmp\\log\\access-poucosdados.log", "\\|");

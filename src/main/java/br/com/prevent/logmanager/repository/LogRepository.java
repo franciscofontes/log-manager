@@ -73,10 +73,12 @@ public class LogRepository implements CRUDRepository<Log, Long> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Log> listarPorFiltro(String data, String ip, String status, String request, String userAgent,
+	public Page<Log> listarPorFiltro(String data, String ip, String status, String request, String userAgent,
 			int pageNumber, int linesPerPage, String orderBy, String direction) {
+		
 		String where = "";
 		List<String> filtros = new ArrayList<>();
+		
 		if (!data.isEmpty()) {
 			filtros.add("data='" + data + "'");
 		}
@@ -93,17 +95,34 @@ public class LogRepository implements CRUDRepository<Log, Long> {
 			filtros.add("user_agent like '%" + userAgent + "%'");
 		}
 		for (int i = 0; i < filtros.size(); i++) {
+			if (i == 0) {
+				where = "where ";
+			}
 			String item = filtros.get(i);
 			where += item;
 			if (i < filtros.size() - 1) {
 				where += " and ";
 			}
 		}
-		Query query = em.createQuery("from logs where " + where + " order by " + orderBy + " " + direction);
+		
+		String q = "from logs " + where + " order by " + orderBy + " " + direction;
+		System.out.println(q);
+		Query query = em.createQuery(q);
 		query.setFirstResult((pageNumber - 1) * linesPerPage);
 		query.setMaxResults(linesPerPage);
 		List<Log> logs = query.getResultList();
-		return logs;
+		
+		Query queryCount = em.createQuery("select count(log.id) from logs log");
+		long countResult = (long) queryCount.getSingleResult();
+
+		int totalElements = Long.valueOf(countResult).intValue();
+		int totalPages = totalElements / linesPerPage;	
+		boolean first = pageNumber == 1;
+		boolean last = pageNumber == totalPages;
+
+		Page<Log> page = new Page<Log>(logs, pageNumber, first, last, linesPerPage, totalPages, totalElements);		
+		
+		return page;
 	}
 
 }

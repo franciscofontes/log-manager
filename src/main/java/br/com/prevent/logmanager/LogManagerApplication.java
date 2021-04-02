@@ -23,4 +23,5 @@ public class LogManagerApplication extends SpringBootServletInitializer implemen
 	@Override
 	public void run(String... args) throws Exception {
 	}
+	
 }

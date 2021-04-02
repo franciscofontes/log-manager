@@ -80,7 +80,7 @@ public class LogService implements CRUDService<Log, Long> {
 		return repository.listarPorPagina(pageNumber, linesPerPage, orderBy, direction);
 	}
 
-	public List<Log> listarPorFiltro(String data, String ip, String status, String request, String userAgent,
+	public Page<Log> listarPorFiltro(String data, String ip, String status, String request, String userAgent,
 			int pageNumber, int linesPerPage, String orderBy, String direction) {
 		return repository.listarPorFiltro(data, ip, status, request, userAgent, pageNumber, linesPerPage, orderBy,
 				direction);
