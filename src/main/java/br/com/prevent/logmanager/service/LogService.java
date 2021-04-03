@@ -1,21 +1,25 @@
 package br.com.prevent.logmanager.service;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
 import javax.validation.ConstraintViolationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.multipart.MultipartFile;
 
 import br.com.prevent.logmanager.domain.Log;
 import br.com.prevent.logmanager.repository.LogRepository;
@@ -30,10 +34,17 @@ public class LogService implements CRUDService<Log, Long> {
 
 	@Autowired
 	private LogRepository repository;
+	
+	@Autowired
+	private Environment env;
 
 	@Override
 	public void adicionar(Log log) throws MethodArgumentNotValidException {
 		try {
+			log.setDataCadastro(new Date());
+			if (!log.isExtraidoDeArquivo()) {
+				log.setData(new Date());
+			}
 			repository.adicionar(log);
 		} catch (ConstraintViolationException | DataIntegrityViolationException e) {
 			throw new DataIntegrityException(DataIntegrityException.MSG_ADD, null, Log.class);
@@ -86,14 +97,15 @@ public class LogService implements CRUDService<Log, Long> {
 				direction);
 	}
 
-	public List<Log> getLogsPeloArquivo(String url, String delimitador) {
+	public List<Log> getLogsPeloArquivo(MultipartFile file, String delimitador) throws ArquivoLogException, MethodArgumentNotValidException {
 		List<Log> logs = new ArrayList<>();
 		int nrLinha = 1;
-		String dateFormat = "yyyy-MM-dd HH:mm:ss.SSS";
-		LogValidatorUtil validator = new LogValidatorUtil();
+		String dateFormat = LogValidatorUtil.DATE_FORMAT;
 		try {
-			Path path = Paths.get(url);
-			for (String linha : Files.readAllLines(path)) {
+			LogValidatorUtil validator = new LogValidatorUtil();
+			String[] linhas = getLinhasArquivo(file, delimitador);
+			System.out.println("linhas:" + linhas.length);
+			for (String linha : linhas) {
 				String[] resultado = linha.split(delimitador);
 				String data = resultado[0];
 				String ip = resultado[1];
@@ -110,22 +122,37 @@ public class LogService implements CRUDService<Log, Long> {
 				logs.add(log);
 				nrLinha++;
 			}
-		} catch (IOException e) {
-			throw new ArquivoLogException("Ocorreu um erro ao importar o arquivo");
 		} catch (ParseException e) {
 			throw new ArquivoLogException("Data nao esta no formato: " + dateFormat, nrLinha, "data");
 		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new ArquivoLogException("Esta faltando algum atributo", nrLinha);
+			throw new ArquivoLogException("Arquivo vazio ou esta faltando algum atributo", nrLinha);
 		}
 		return logs;
 	}
 
-	public void adicionarLogsPeloArquivo(String url, String delimitador)
-			throws ArquivoLogException, MethodArgumentNotValidException {
-		List<Log> logs = getLogsPeloArquivo(url, delimitador);
-		for (Log log : logs) {
-			adicionar(log);
+	public String[] getLinhasArquivo(MultipartFile file, String delimitador) throws ArquivoLogException, MethodArgumentNotValidException {
+		try {
+			String conteudo = new BufferedReader(new InputStreamReader(file.getInputStream())).lines().collect(Collectors.joining("\n"));
+			String[] linhas = conteudo.trim().split("\n");
+			return linhas;
+		} catch (IOException e) {
+			throw new ArquivoLogException("Ocorreu um erro ao importar o arquivo");
 		}
 	}
-	
+
+	@Transactional
+	public void adicionarLogsPeloArquivo(MultipartFile file, String delimitador) throws ArquivoLogException, MethodArgumentNotValidException {
+		List<Log> logs = getLogsPeloArquivo(file, delimitador);
+		int size = Integer.parseInt(env.getProperty("spring.jpa.properties.hibernate.jdbc.batch_size"));
+		for (int i = 0; i < logs.size(); i++) {	
+			Log log = logs.get(i);
+	        if (i > 0 && i % size == 0) {
+	            repository.flush();
+	            repository.clear();
+	        }
+	        log.setNomeArquivo(file.getOriginalFilename());
+			adicionar(log);
+		}		
+	}
+
 }

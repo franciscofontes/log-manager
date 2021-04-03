@@ -24,6 +24,12 @@ public class Log implements Serializable {
 	@SequenceGenerator(name = "log_id_seq", sequenceName = "log_id_seq", allocationSize = 1, initialValue = 1)
 	private Long id;
 
+	@Column(name = "data_cadastro")
+	private Date dataCadastro;
+	
+	@Column(name = "nome_arquivo")
+	private String nomeArquivo;	
+	
 	@Column(nullable = false)
 	private Date data;
 
@@ -46,6 +52,7 @@ public class Log implements Serializable {
 
 	public Log(String ip, String request, String status, String userAgent) {
 		super();
+		this.dataCadastro = new Date();
 		this.data = new Date();
 		this.ip = ip;
 		this.request = request;
@@ -78,9 +85,29 @@ public class Log implements Serializable {
 	public void setId(Long id) {
 		this.id = id;
 	}
+	
+	public Date getDataCadastro() {
+		return dataCadastro;
+	}
+	
+	public void setDataCadastro(Date dataCadastro) {
+		this.dataCadastro = dataCadastro;
+	}
 
 	public Date getData() {
 		return data;
+	}
+	
+	public String getNomeArquivo() {
+		return nomeArquivo;
+	}
+	
+	public void setNomeArquivo(String nomeArquivo) {
+		this.nomeArquivo = nomeArquivo;
+	}
+	
+	public boolean isExtraidoDeArquivo() {
+		return getNomeArquivo() != null && !getNomeArquivo().isBlank();
 	}
 
 	public void setData(Date data) {

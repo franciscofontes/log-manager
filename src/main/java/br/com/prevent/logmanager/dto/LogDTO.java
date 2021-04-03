@@ -10,6 +10,8 @@ public class LogDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private Long id;
+	private Date dataCadastro;
+	private String nomeArquivo;
 	private Date data;
 	private String ip;
 	private String request;
@@ -20,6 +22,8 @@ public class LogDTO implements Serializable {
 
 	public LogDTO(Log log) {
 		this.id = log.getId();
+		this.dataCadastro = log.getDataCadastro();
+		this.nomeArquivo = log.getNomeArquivo();
 		this.data = log.getData();
 		this.ip = log.getIp();
 		this.request = log.getRequest();
@@ -33,6 +37,26 @@ public class LogDTO implements Serializable {
 	public void setId(Long id) {
 		this.id = id;
 	}
+	
+	public Date getDataCadastro() {
+		return dataCadastro;
+	}
+	
+	public void setDataCadastro(Date dataCadastro) {
+		this.dataCadastro = dataCadastro;
+	}
+	
+	public String getNomeArquivo() {
+		return nomeArquivo;
+	}
+	
+	public void setNomeArquivo(String nomeArquivo) {
+		this.nomeArquivo = nomeArquivo;
+	}
+	
+	public boolean isExtraidoDeArquivo() {
+		return getNomeArquivo() != null && !getNomeArquivo().isBlank();
+	}	
 
 	public Date getData() {
 		return data;

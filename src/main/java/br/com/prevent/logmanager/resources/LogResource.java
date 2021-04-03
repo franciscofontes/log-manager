@@ -1,10 +1,7 @@
 package br.com.prevent.logmanager.resources;
 
 import java.net.URI;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -12,26 +9,20 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.prevent.logmanager.domain.Log;
 import br.com.prevent.logmanager.dto.LogDTO;
 import br.com.prevent.logmanager.repository.domain.Page;
 import br.com.prevent.logmanager.service.LogService;
 
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/logs")
 public class LogResource implements CRUDResource<Log, LogDTO, Long> {
@@ -42,7 +33,7 @@ public class LogResource implements CRUDResource<Log, LogDTO, Long> {
 	@Override
 	@RequestMapping(method = RequestMethod.POST)
 	public ResponseEntity<Void> adicionar(@Valid @RequestBody Log log) throws MethodArgumentNotValidException {
-		log.setData(new Date());
+		
 		service.adicionar(log);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(log.getId()).toUri();
 		return ResponseEntity.created(uri).build();
@@ -73,7 +64,8 @@ public class LogResource implements CRUDResource<Log, LogDTO, Long> {
 			@RequestParam(value = "direction", defaultValue = "DESC") String direction) {
 		Page<Log> pageLogs = service.listarPorPagina(page, linesPerPage, orderBy, direction);
 		List<LogDTO> dtos = pageLogs.getContent().stream().map(log -> new LogDTO(log)).collect(Collectors.toList());
-		Page<LogDTO> pageDtos = new Page<>(dtos, pageLogs.getNumber(), pageLogs.isFirst(), pageLogs.isLast(), pageLogs.getSize(), pageLogs.getTotalPages(), pageLogs.getTotalElements()); 
+		Page<LogDTO> pageDtos = new Page<>(dtos, pageLogs.getNumber(), pageLogs.isFirst(), pageLogs.isLast(),
+				pageLogs.getSize(), pageLogs.getTotalPages(), pageLogs.getTotalElements());
 		return ResponseEntity.ok().body(pageDtos);
 	}
 
@@ -86,11 +78,12 @@ public class LogResource implements CRUDResource<Log, LogDTO, Long> {
 			@RequestParam(value = "page", defaultValue = "1") Integer page,
 			@RequestParam(value = "lines", defaultValue = "12") Integer linesPerPage,
 			@RequestParam(value = "orderBy", defaultValue = "id") String orderBy,
-			@RequestParam(value = "direction", defaultValue = "ASC") String direction) {
+			@RequestParam(value = "direction", defaultValue = "DESC") String direction) {
 		Page<Log> pageLogs = service.listarPorFiltro(data, ip, status, request, userAgent, page, linesPerPage, orderBy,
 				direction);
 		List<LogDTO> dtos = pageLogs.getContent().stream().map(log -> new LogDTO(log)).collect(Collectors.toList());
-		Page<LogDTO> pageDtos = new Page<>(dtos, pageLogs.getNumber(), pageLogs.isFirst(), pageLogs.isLast(), pageLogs.getSize(), pageLogs.getTotalPages(), pageLogs.getTotalElements());		
+		Page<LogDTO> pageDtos = new Page<>(dtos, pageLogs.getNumber(), pageLogs.isFirst(), pageLogs.isLast(),
+				pageLogs.getSize(), pageLogs.getTotalPages(), pageLogs.getTotalElements());
 		return ResponseEntity.ok().body(pageDtos);
 	}
 
@@ -107,13 +100,9 @@ public class LogResource implements CRUDResource<Log, LogDTO, Long> {
 		return ResponseEntity.noContent().build();
 	}
 
-	@RequestMapping(value = "/adicionarPeloArquivo", method = RequestMethod.POST)
-	public ResponseEntity<Void> adicionarPeloArquivo(@RequestBody String url)
-			throws MethodArgumentNotValidException, JsonMappingException, JsonProcessingException {
-		ObjectMapper mapper = new ObjectMapper();
-		Map<String, Object> parsedMap = mapper.readValue(url, new TypeReference<HashMap<String, Object>>() {
-		});
-		service.adicionarLogsPeloArquivo(parsedMap.get("url").toString(), "\\|");
+	@RequestMapping(value = "/upload", method = RequestMethod.POST)
+	public ResponseEntity<Void> adicionarPeloArquivo(@RequestParam("file") MultipartFile file) throws MethodArgumentNotValidException {
+		service.adicionarLogsPeloArquivo(file, "\\|");
 		return ResponseEntity.noContent().build();
 	}
 
