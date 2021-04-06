@@ -6,7 +6,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import br.com.prevent.logmanager.repository.domain.Page;
 
-public interface CRUDService<T, ID> {
+public interface CrudService<T, ID> {
 
 	void adicionar(T entity) throws MethodArgumentNotValidException;
 

@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import br.com.prevent.logmanager.repository.domain.Page;
 
-public interface CRUDRepository<T, ID> {
+public interface CrudRepository<T, ID> {
 
 	void adicionar(T entity) throws RuntimeException;
 

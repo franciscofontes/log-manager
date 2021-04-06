@@ -22,6 +22,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.multipart.MultipartFile;
 
 import br.com.prevent.logmanager.domain.Log;
+import br.com.prevent.logmanager.domain.LogEstatistica;
 import br.com.prevent.logmanager.repository.LogRepository;
 import br.com.prevent.logmanager.repository.domain.Page;
 import br.com.prevent.logmanager.service.exception.ArquivoLogException;
@@ -30,7 +31,7 @@ import br.com.prevent.logmanager.service.exception.ObjectNotFoundException;
 import br.com.prevent.logmanager.service.validation.util.LogValidatorUtil;
 
 @Service
-public class LogService implements CRUDService<Log, Long> {
+public class LogService implements CrudService<Log, Long> {
 
 	@Autowired
 	private LogRepository repository;
@@ -121,6 +122,10 @@ public class LogService implements CRUDService<Log, Long> {
 		return repository.listarUserAgentsUnicos();
 	}
 
+	public List<LogEstatistica> listarEstatisticasPorIp(String ip, int pageNumber, int linesPerPage, String orderBy, String direction) {	
+		return repository.listarEstatisticasPorIp(ip, pageNumber, linesPerPage, orderBy, direction);
+	}
+	
 	public List<Log> getLogsPeloArquivo(MultipartFile file, String delimitador)
 			throws ArquivoLogException, MethodArgumentNotValidException {
 		List<Log> logs = new ArrayList<>();

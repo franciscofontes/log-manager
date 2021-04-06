@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import br.com.prevent.logmanager.repository.domain.Page;
 
-public interface CRUDResource<T, DTO, ID> {
+public interface CrudResource<T, DTO, ID> {
 
 	ResponseEntity<Void> adicionar(@Valid @RequestBody T t) throws MethodArgumentNotValidException;
 

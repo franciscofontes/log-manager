@@ -10,13 +10,13 @@ import javax.transaction.Transactional;
 
 import br.com.prevent.logmanager.repository.domain.Page;
 
-public abstract class GenericJpaRepository<T, ID> implements CRUDRepository<T, ID> {
+public abstract class GenericJpaRepository<T, ID> implements CrudRepository<T, ID> {
 
 	@PersistenceContext
-	private EntityManager em;
+	protected EntityManager em;
 
-	private final Class<T> entityClass;
-	private String table;
+	protected final Class<T> entityClass;
+	protected String table;
 
 	public GenericJpaRepository(Class<T> entityClass, String table) {
 		this.entityClass = entityClass;
@@ -45,7 +45,7 @@ public abstract class GenericJpaRepository<T, ID> implements CRUDRepository<T, I
 
 	@Override
 	public Optional<T> buscarPorId(ID id) throws RuntimeException {
-		return Optional.of(em.find(entityClass.getClass(), id));
+		return Optional.of(em.find(entityClass, id));
 	}
 
 	@Transactional

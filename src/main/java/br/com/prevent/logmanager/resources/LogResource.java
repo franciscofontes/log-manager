@@ -19,13 +19,14 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import br.com.prevent.logmanager.domain.Log;
+import br.com.prevent.logmanager.domain.LogEstatistica;
 import br.com.prevent.logmanager.dto.LogDTO;
 import br.com.prevent.logmanager.repository.domain.Page;
 import br.com.prevent.logmanager.service.LogService;
 
 @RestController
 @RequestMapping(value = "/logs")
-public class LogResource implements CRUDResource<Log, LogDTO, Long> {
+public class LogResource implements CrudResource<Log, LogDTO, Long> {
 
 	@Autowired
 	private LogService service;
@@ -63,7 +64,8 @@ public class LogResource implements CRUDResource<Log, LogDTO, Long> {
 	
 	@Override
 	@RequestMapping(value = "/page", method = RequestMethod.GET)
-	public ResponseEntity<Page<LogDTO>> listarPorPagina(@RequestParam(value = "page", defaultValue = "1") Integer page,
+	public ResponseEntity<Page<LogDTO>> listarPorPagina(
+			@RequestParam(value = "page", defaultValue = "1") Integer page,
 			@RequestParam(value = "lines", defaultValue = "12") Integer linesPerPage,
 			@RequestParam(value = "orderBy", defaultValue = "id") String orderBy,
 			@RequestParam(value = "direction", defaultValue = "DESC") String direction) {
@@ -122,6 +124,17 @@ public class LogResource implements CRUDResource<Log, LogDTO, Long> {
 	@RequestMapping(value = "/userAgents", method = RequestMethod.GET)
 	public List<String> listarUserAgentsUnicos() {
 		return service.listarUserAgentsUnicos();
+	}
+	
+	@RequestMapping(value = "/estatisticasPorIp", method = RequestMethod.GET)
+	public ResponseEntity<List<LogEstatistica>> listarEstatisticasPorIp(
+			@RequestParam(value = "ip", defaultValue = "") String ip,
+			@RequestParam(value = "page", defaultValue = "1") Integer page,
+			@RequestParam(value = "lines", defaultValue = "12") Integer linesPerPage,
+			@RequestParam(value = "orderBy", defaultValue = "id") String orderBy,
+			@RequestParam(value = "direction", defaultValue = "DESC") String direction) throws MethodArgumentNotValidException {
+		List<LogEstatistica> logs = service.listarEstatisticasPorIp(ip, page, linesPerPage, orderBy, direction);
+		return ResponseEntity.ok().body(logs);
 	}
 	
 	@RequestMapping(value = "/upload", method = RequestMethod.POST)
