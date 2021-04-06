@@ -1,4 +1,4 @@
-package com.prevent.logmanager;
+package br.com.prevent.logmanager;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
