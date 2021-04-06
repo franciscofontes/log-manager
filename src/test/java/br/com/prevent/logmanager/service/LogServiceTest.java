@@ -67,13 +67,14 @@ class LogServiceTest {
 	}
 
 	@Test
-	void testlistarPorFiltro() throws ParseException {
-		String dataString = "";
+	void testlistarPorFiltro() throws ParseException, MethodArgumentNotValidException {
+		String de = "";
+		String ate = "";
 		String ip = "";
 		String status = "";
 		String request = "GET";
 		String userAgent = "Teste";
-		Page<Log> page = service.listarPorFiltro(dataString, ip, status, request, userAgent, 1, 10, "id", "asc");
+		Page<Log> page = service.listarPorFiltro(de, ate, ip, status, request, userAgent, 1, 10, "id", "asc");
 		for (Log p : page.getContent()) {
 			System.out.println(p);
 		}

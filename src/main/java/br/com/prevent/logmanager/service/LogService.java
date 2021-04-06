@@ -34,7 +34,7 @@ public class LogService implements CRUDService<Log, Long> {
 
 	@Autowired
 	private LogRepository repository;
-	
+
 	@Autowired
 	private Environment env;
 
@@ -91,13 +91,38 @@ public class LogService implements CRUDService<Log, Long> {
 		return repository.listarPorPagina(pageNumber, linesPerPage, orderBy, direction);
 	}
 
-	public Page<Log> listarPorFiltro(String data, String ip, String status, String request, String userAgent,
-			int pageNumber, int linesPerPage, String orderBy, String direction) {
-		return repository.listarPorFiltro(data, ip, status, request, userAgent, pageNumber, linesPerPage, orderBy,
-				direction);
+	public Page<Log> listarPorFiltro(String de, String ate, String ip, String status, String request, String userAgent,
+			int pageNumber, int linesPerPage, String orderBy, String direction) throws MethodArgumentNotValidException {
+		try {
+			return repository.listarPorFiltro(de, ate, ip, status, request, userAgent, pageNumber, linesPerPage, orderBy,
+					direction);
+		} catch (ParseException e) {
+			throw new ArquivoLogException("Data nao esta no formato correto");
+		}
+	}
+	
+	public Integer buscarQuantidadeLogs() {
+		return repository.buscarQuantidadeLogs();
+	}	
+	
+	public Integer buscarQuantidadeIpsUnicos() {
+		return repository.buscarQuantidadeIpsUnicos();
+	}
+	
+	public Integer buscarQuantidadeUserAgentsUnicos() {
+		return repository.buscarQuantidadeUserAgentsUnicos();
+	}
+	
+	public List<String> listarIpsUnicos() {
+		return repository.listarIpsUnicos();
+	}
+	
+	public List<String> listarUserAgentsUnicos() {
+		return repository.listarUserAgentsUnicos();
 	}
 
-	public List<Log> getLogsPeloArquivo(MultipartFile file, String delimitador) throws ArquivoLogException, MethodArgumentNotValidException {
+	public List<Log> getLogsPeloArquivo(MultipartFile file, String delimitador)
+			throws ArquivoLogException, MethodArgumentNotValidException {
 		List<Log> logs = new ArrayList<>();
 		int nrLinha = 1;
 		String dateFormat = LogValidatorUtil.DATE_FORMAT;
@@ -109,9 +134,9 @@ public class LogService implements CRUDService<Log, Long> {
 				String[] resultado = linha.split(delimitador);
 				String data = resultado[0];
 				String ip = resultado[1];
-				String request = resultado[2];
+				String request = resultado[2].replace("\"", "");
 				String status = resultado[3];
-				String userAgent = resultado[4];
+				String userAgent = resultado[4].replace("\"", "");
 				Log log = new Log(new SimpleDateFormat(dateFormat).parse(data), ip, request, status, userAgent);
 				if (!validator.isIpValid(log.getIp())) {
 					throw new ArquivoLogException(LogValidatorUtil.MSG_IP_INVALIDO, nrLinha, "ip");
@@ -130,9 +155,11 @@ public class LogService implements CRUDService<Log, Long> {
 		return logs;
 	}
 
-	public String[] getLinhasArquivo(MultipartFile file, String delimitador) throws ArquivoLogException, MethodArgumentNotValidException {
+	public String[] getLinhasArquivo(MultipartFile file, String delimitador)
+			throws ArquivoLogException, MethodArgumentNotValidException {
 		try {
-			String conteudo = new BufferedReader(new InputStreamReader(file.getInputStream())).lines().collect(Collectors.joining("\n"));
+			String conteudo = new BufferedReader(new InputStreamReader(file.getInputStream())).lines()
+					.collect(Collectors.joining("\n"));
 			String[] linhas = conteudo.trim().split("\n");
 			return linhas;
 		} catch (IOException e) {
@@ -141,18 +168,19 @@ public class LogService implements CRUDService<Log, Long> {
 	}
 
 	@Transactional
-	public void adicionarLogsPeloArquivo(MultipartFile file, String delimitador) throws ArquivoLogException, MethodArgumentNotValidException {
+	public void adicionarLogsPeloArquivo(MultipartFile file, String delimitador)
+			throws ArquivoLogException, MethodArgumentNotValidException {
 		List<Log> logs = getLogsPeloArquivo(file, delimitador);
 		int size = Integer.parseInt(env.getProperty("spring.jpa.properties.hibernate.jdbc.batch_size"));
-		for (int i = 0; i < logs.size(); i++) {	
+		for (int i = 0; i < logs.size(); i++) {
 			Log log = logs.get(i);
-	        if (i > 0 && i % size == 0) {
-	            repository.flush();
-	            repository.clear();
-	        }
-	        log.setNomeArquivo(file.getOriginalFilename());
+			if (i > 0 && i % size == 0) {
+				repository.flush();
+				repository.clear();
+			}
+			log.setNomeArquivo(file.getOriginalFilename());
 			adicionar(log);
-		}		
+		}
 	}
 
 }

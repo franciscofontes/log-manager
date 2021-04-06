@@ -32,8 +32,7 @@ public class LogResource implements CRUDResource<Log, LogDTO, Long> {
 
 	@Override
 	@RequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<Void> adicionar(@Valid @RequestBody Log log) throws MethodArgumentNotValidException {
-		
+	public ResponseEntity<Void> adicionar(@Valid @RequestBody Log log) throws MethodArgumentNotValidException {		
 		service.adicionar(log);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(log.getId()).toUri();
 		return ResponseEntity.created(uri).build();
@@ -57,6 +56,12 @@ public class LogResource implements CRUDResource<Log, LogDTO, Long> {
 	}
 
 	@Override
+	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	public ResponseEntity<Log> buscarPorId(@PathVariable Long id) {
+		return ResponseEntity.ok().body(service.buscarPorId(id));
+	}	
+	
+	@Override
 	@RequestMapping(value = "/page", method = RequestMethod.GET)
 	public ResponseEntity<Page<LogDTO>> listarPorPagina(@RequestParam(value = "page", defaultValue = "1") Integer page,
 			@RequestParam(value = "lines", defaultValue = "12") Integer linesPerPage,
@@ -68,9 +73,18 @@ public class LogResource implements CRUDResource<Log, LogDTO, Long> {
 				pageLogs.getSize(), pageLogs.getTotalPages(), pageLogs.getTotalElements());
 		return ResponseEntity.ok().body(pageDtos);
 	}
+	
+	@Override
+	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+	public ResponseEntity<Void> remover(@PathVariable Long id) throws MethodArgumentNotValidException {
+		service.remover(id);
+		return ResponseEntity.noContent().build();
+	}	
 
 	@RequestMapping(value = "/search", method = RequestMethod.GET)
-	public ResponseEntity<Page<LogDTO>> listarPorFiltro(@RequestParam(value = "data", defaultValue = "") String data,
+	public ResponseEntity<Page<LogDTO>> listarPorFiltro(
+			@RequestParam(value = "de", defaultValue = "") String de,
+			@RequestParam(value = "ate", defaultValue = "") String ate,
 			@RequestParam(value = "ip", defaultValue = "") String ip,
 			@RequestParam(value = "status", defaultValue = "") String status,
 			@RequestParam(value = "request", defaultValue = "") String request,
@@ -78,28 +92,38 @@ public class LogResource implements CRUDResource<Log, LogDTO, Long> {
 			@RequestParam(value = "page", defaultValue = "1") Integer page,
 			@RequestParam(value = "lines", defaultValue = "12") Integer linesPerPage,
 			@RequestParam(value = "orderBy", defaultValue = "id") String orderBy,
-			@RequestParam(value = "direction", defaultValue = "DESC") String direction) {
-		Page<Log> pageLogs = service.listarPorFiltro(data, ip, status, request, userAgent, page, linesPerPage, orderBy,
-				direction);
+			@RequestParam(value = "direction", defaultValue = "DESC") String direction) throws MethodArgumentNotValidException {
+		Page<Log> pageLogs = service.listarPorFiltro(de, ate, ip, status, request, userAgent, page, linesPerPage, orderBy, direction);
 		List<LogDTO> dtos = pageLogs.getContent().stream().map(log -> new LogDTO(log)).collect(Collectors.toList());
-		Page<LogDTO> pageDtos = new Page<>(dtos, pageLogs.getNumber(), pageLogs.isFirst(), pageLogs.isLast(),
-				pageLogs.getSize(), pageLogs.getTotalPages(), pageLogs.getTotalElements());
+		Page<LogDTO> pageDtos = new Page<>(dtos, pageLogs.getNumber(), pageLogs.isFirst(), pageLogs.isLast(), pageLogs.getSize(), pageLogs.getTotalPages(), pageLogs.getTotalElements());
 		return ResponseEntity.ok().body(pageDtos);
 	}
-
-	@Override
-	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
-	public ResponseEntity<Log> buscarPorId(@PathVariable Long id) {
-		return ResponseEntity.ok().body(service.buscarPorId(id));
+	
+	@RequestMapping(value = "/quant", method = RequestMethod.GET)
+	public Integer buscarQuantidadeLogs() {
+		return service.buscarQuantidadeLogs();
+	}	
+	
+	@RequestMapping(value = "/quantIps", method = RequestMethod.GET)
+	public Integer buscarQuantidadeIpsUnicos() {
+		return service.buscarQuantidadeIpsUnicos();
 	}
-
-	@Override
-	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-	public ResponseEntity<Void> remover(@PathVariable Long id) throws MethodArgumentNotValidException {
-		service.remover(id);
-		return ResponseEntity.noContent().build();
+	
+	@RequestMapping(value = "/quantUserAgents", method = RequestMethod.GET)
+	public Integer buscarQuantidadeUserAgentsUnicos() {
+		return service.buscarQuantidadeUserAgentsUnicos();
 	}
-
+	
+	@RequestMapping(value = "/ips", method = RequestMethod.GET)
+	public List<String> listarIpsUnicos() {
+		return service.listarIpsUnicos();
+	}
+	
+	@RequestMapping(value = "/userAgents", method = RequestMethod.GET)
+	public List<String> listarUserAgentsUnicos() {
+		return service.listarUserAgentsUnicos();
+	}
+	
 	@RequestMapping(value = "/upload", method = RequestMethod.POST)
 	public ResponseEntity<Void> adicionarPeloArquivo(@RequestParam("file") MultipartFile file) throws MethodArgumentNotValidException {
 		service.adicionarLogsPeloArquivo(file, "\\|");

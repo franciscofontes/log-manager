@@ -16,6 +16,6 @@ public interface CRUDRepository<T, ID> {
 	Optional<T> buscarPorId(ID id) throws RuntimeException;
 
 	void remover(ID id) throws RuntimeException;
-	
+
 	Page<T> listarPorPagina(int pageNumber, int linesPerPage, String orderBy, String direction);
 }
