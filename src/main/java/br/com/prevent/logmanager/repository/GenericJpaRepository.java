@@ -58,7 +58,7 @@ public abstract class GenericJpaRepository<T, ID> implements CrudRepository<T, I
 	@SuppressWarnings("unchecked")
 	public Page<T> listarPorPagina(int pageNumber, int linesPerPage, String orderBy, String direction) {
 		Query query = em.createQuery("from " + table + " order by " + orderBy + " " + direction);
-		query.setFirstResult((pageNumber - 1) * linesPerPage);
+		query.setFirstResult((pageNumber) * linesPerPage);
 		query.setMaxResults(linesPerPage);
 		List<T> list = query.getResultList();
 

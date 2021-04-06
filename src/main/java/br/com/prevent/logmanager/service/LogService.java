@@ -134,7 +134,6 @@ public class LogService implements CrudService<Log, Long> {
 		try {
 			LogValidatorUtil validator = new LogValidatorUtil();
 			String[] linhas = getLinhasArquivo(file, delimitador);
-			System.out.println("linhas:" + linhas.length);
 			for (String linha : linhas) {
 				String[] resultado = linha.split(delimitador);
 				String data = resultado[0];

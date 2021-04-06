@@ -67,7 +67,7 @@ public class LogRepository extends GenericJpaRepository<Log, Long> {
 		String q = "from " + table + " " + where + " order by " + orderBy + " " + direction;
 		System.out.println("query:" + q);
 		Query query = em.createQuery(q);
-		query.setFirstResult((pageNumber - 1) * linesPerPage);
+		query.setFirstResult((pageNumber) * linesPerPage);
 		query.setMaxResults(linesPerPage);
 		List<Log> logs = query.getResultList();
 

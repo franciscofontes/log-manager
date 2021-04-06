@@ -65,7 +65,7 @@ public class LogResource implements CrudResource<Log, LogDTO, Long> {
 	@Override
 	@RequestMapping(value = "/page", method = RequestMethod.GET)
 	public ResponseEntity<Page<LogDTO>> listarPorPagina(
-			@RequestParam(value = "page", defaultValue = "1") Integer page,
+			@RequestParam(value = "page", defaultValue = "0") Integer page,
 			@RequestParam(value = "lines", defaultValue = "12") Integer linesPerPage,
 			@RequestParam(value = "orderBy", defaultValue = "id") String orderBy,
 			@RequestParam(value = "direction", defaultValue = "DESC") String direction) {
@@ -91,7 +91,7 @@ public class LogResource implements CrudResource<Log, LogDTO, Long> {
 			@RequestParam(value = "status", defaultValue = "") String status,
 			@RequestParam(value = "request", defaultValue = "") String request,
 			@RequestParam(value = "userAgent", defaultValue = "") String userAgent,
-			@RequestParam(value = "page", defaultValue = "1") Integer page,
+			@RequestParam(value = "page", defaultValue = "0") Integer page,
 			@RequestParam(value = "lines", defaultValue = "12") Integer linesPerPage,
 			@RequestParam(value = "orderBy", defaultValue = "id") String orderBy,
 			@RequestParam(value = "direction", defaultValue = "DESC") String direction) throws MethodArgumentNotValidException {
@@ -129,7 +129,7 @@ public class LogResource implements CrudResource<Log, LogDTO, Long> {
 	@RequestMapping(value = "/estatisticasPorIp", method = RequestMethod.GET)
 	public ResponseEntity<List<LogEstatistica>> listarEstatisticasPorIp(
 			@RequestParam(value = "ip", defaultValue = "") String ip,
-			@RequestParam(value = "page", defaultValue = "1") Integer page,
+			@RequestParam(value = "page", defaultValue = "0") Integer page,
 			@RequestParam(value = "lines", defaultValue = "12") Integer linesPerPage,
 			@RequestParam(value = "orderBy", defaultValue = "id") String orderBy,
 			@RequestParam(value = "direction", defaultValue = "DESC") String direction) throws MethodArgumentNotValidException {
