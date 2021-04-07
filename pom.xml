@@ -12,7 +12,7 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
-	<groupId>com.example</groupId>
+	<groupId>br.com.prevent</groupId>
 	<artifactId>log-manager</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>log-manager</name>
